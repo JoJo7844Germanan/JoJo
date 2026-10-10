@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "post-1791675633596",
+    "title": "Kleiner Test",
+    "date": "2026-10-11",
+    "category": "TEST",
+    "image": "temp.png",
+    "excerpt": "Nur ein Test",
+    "body": "DAS 2. MAAAAL LAAL",
+    "published": true
+  }
+]
