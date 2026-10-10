@@ -23,3 +23,5 @@ BLOG:
 - Nicht veröffentlichte Entwürfe bleiben in der JSON-Datei enthalten, werden auf der Website aber nicht angezeigt.
   Falls Entwürfe geheim bleiben sollen, diese nicht ins öffentliche Repository hochladen.
 - Für direktes Online-Publishing und ein geschütztes Login wird später ein Backend oder CMS benötigt.
+
+Blogbild: Temp.png ist im Hauptordner und assets vorhanden. Im Panel Temp.png eintragen, Beitrag speichern, JSON exportieren und blog-posts.json sowie die Bilddatei auf GitHub hochladen.
