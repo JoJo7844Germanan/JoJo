@@ -1,0 +1,15 @@
+const KEY='jojo-blog-drafts-v1';
+const $=id=>document.getElementById(id);
+let posts=[];let selected=null;
+try {const saved=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(saved))posts=saved;}catch{}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(posts));$('admin-status').textContent='Lokal gespeichert. Für die Veröffentlichung bitte JSON exportieren.';}catch{$('admin-status').textContent='Lokales Speichern fehlgeschlagen. Bitte JSON exportieren.';}};
+const fieldIds=['title','date','category','image','excerpt','body','published'];
+function renderList(){const list=$('post-list');list.replaceChildren();posts.forEach(post=>{const btn=document.createElement('button');btn.type='button';btn.className='post-item'+(selected===post.id?' active':'');btn.textContent=post.title||'Ohne Titel';const small=document.createElement('small');small.textContent=(post.published?'Öffentlich':'Entwurf')+' · '+(post.date||'ohne Datum');btn.append(small);btn.onclick=()=>loadPost(post.id);list.append(btn);});}
+function loadPost(id){selected=id;const post=posts.find(p=>p.id===id)||{};fieldIds.forEach(key=>{const el=$('post-'+key);if(key==='published')el.checked=Boolean(post[key]);else el.value=post[key]||'';});renderList();}
+function newPost(){selected=null;$('post-form').reset();$('post-date').value=new Date().toLocaleDateString('en-CA');renderList();$('post-title').focus();}
+$('new-post').onclick=newPost;
+$('post-form').onsubmit=e=>{e.preventDefault();const post={id:selected||('post-'+Date.now()),...Object.fromEntries(fieldIds.map(key=>[key,key==='published'?$('post-'+key).checked:$('post-'+key).value.trim()]))};const i=posts.findIndex(p=>p.id===post.id);if(i<0)posts.push(post);else posts[i]=post;selected=post.id;persist();renderList();};
+$('delete-post').onclick=()=>{if(!selected)return;if(!confirm('Diesen Beitrag wirklich löschen?'))return;posts=posts.filter(p=>p.id!==selected);persist();newPost();};
+$('export-posts').onclick=()=>{const blob=new Blob([JSON.stringify(posts,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='blog-posts.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('admin-status').textContent='JSON exportiert. Zum Veröffentlichen die Datei in GitHub hochladen.';};
+$('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data)||!data.every(p=>p&&typeof p.id==='string'&&typeof p.title==='string'&&typeof p.body==='string'))throw Error('Ungültiges Format');if(posts.length&&!confirm('Lokale Entwürfe durch die importierten Beiträge ersetzen?'))return;posts=data;selected=null;persist();renderList();newPost();$('admin-status').textContent='Beiträge importiert.';}catch{$('admin-status').textContent='Import fehlgeschlagen: ungültige JSON-Datei.';}e.target.value='';};
+renderList();newPost();
